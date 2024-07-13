@@ -82,7 +82,7 @@ async def update_student(student_id: str, student: dict, response: Response, db:
     db.commit()
     response.status_code = 201
     return {
-        "message" : "Student's into edited successfully"
+        "message" : "Student's info edited successfully"
     }
 
 @router_v1.delete('/students/{student_id}')
