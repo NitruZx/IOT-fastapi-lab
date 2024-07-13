@@ -1,7 +1,4 @@
-from urllib import response
 from dotenv import load_dotenv
-from sqlalchemy import null
-from torch import mode
 load_dotenv()
 
 from fastapi import FastAPI, Depends, Response, APIRouter
