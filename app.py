@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from tomlkit import key
 load_dotenv()
 
 from fastapi import FastAPI, Depends, Response, APIRouter
@@ -75,11 +76,10 @@ async def update_student(student_id: str, student: dict, response: Response, db:
         return {
             "message" : "Student's ID not found."
         }
-    stu.id = student["id"] if "id" in student else stu.id
-    stu.firstname = student["firstname"] if "firstname" in student else stu.firstname
-    stu.lastname = student["lastname"] if "lastname" in student else stu.lastname
-    stu.dob = student["dob"] if "dob" in student else stu.dob
-    stu.sex = student["sex"] if "sex" in student else stu.sex
+    keys = ["id", "firstname", "lastname", "dob", "sex"]
+    for key in keys:
+        if key in student:
+            setattr(stu, key, student[key])
     db.commit()
     response.status_code = 201
     return {
