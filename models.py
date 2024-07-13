@@ -2,8 +2,6 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, 
 # from sqlalchemy.orm import relationship
 import enum
 from sqlalchemy import Enum
-from sympy import true
-
 from database import Base
 
 class Book(Base):
