@@ -49,6 +49,39 @@ async def create_book(book: dict, response: Response, db: Session = Depends(get_
     response.status_code = 201
     return newbook
 
+@router_v1.patch('/books/{book_id}')
+async def update_book(book_id: str, book: dict, response: Response, db: Session = Depends(get_db)):
+    bk = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if (bk is None):
+        response.status_code = 400
+        return {
+            "message" : "Book's ID not found."
+        }
+    keys = ["id", "title", "year", "is_published"]
+    for key in keys:
+        if key in book:
+            setattr(bk, key, book[key])
+    db.commit()
+    response.status_code = 201
+    return {
+        "message" : "Book's info edited successfully"
+    }
+
+@router_v1.delete('/books/{book_id}')
+async def delete_book(book_id: str, response: Response, db: Session = Depends(get_db)):
+    bk = db.query(models.Book).filter(models.Book.id == book_id).first()
+    if (bk is not None):
+        db.delete(bk)
+        db.commit()
+        response.status_code = 201
+        return {
+            "message" : "delete info successfully"
+        }
+    response.status_code = 400
+    return {
+        "message" : "Book's ID not found."
+    }
+
 @router_v1.get('/students')
 async def get_students(db: Session = Depends(get_db)):
     return db.query(models.Student).all()
