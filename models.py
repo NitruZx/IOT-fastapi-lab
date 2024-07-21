@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, DateTime,Text
 # from sqlalchemy.orm import relationship
 import enum
 from sqlalchemy import Enum
@@ -12,6 +12,9 @@ class Book(Base):
     author = Column(String, index=True)
     year = Column(Integer, index=True)
     is_published = Column(Boolean, index=True)
+    description = Column(Text, index=True)
+    synopsis = Column(Text, index=True)
+    image_url = Column(Text, index=True)
 
 class Sex(enum.Enum):
     male = 1

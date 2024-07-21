@@ -42,7 +42,13 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
 @router_v1.post('/books')
 async def create_book(book: dict, response: Response, db: Session = Depends(get_db)):
     # TODO: Add validation
-    newbook = models.Book(title=book['title'], author=book['author'], year=book['year'], is_published=book['is_published'])
+    newbook = models.Book(title=book['title'], 
+                          author=book['author'], 
+                          year=book['year'], 
+                          is_published=book['is_published'],
+                          description=book['description'],
+                          synopsis=book['synopsis'],
+                          image_url=book['image_url'])
     db.add(newbook)
     db.commit()
     db.refresh(newbook)
@@ -57,10 +63,8 @@ async def update_book(book_id: str, book: dict, response: Response, db: Session 
         return {
             "message" : "Book's ID not found."
         }
-    keys = ["id", "title", "year", "is_published"]
-    for key in keys:
-        if key in book:
-            setattr(bk, key, book[key])
+    for key in book:
+        setattr(bk, key, book[key])
     db.commit()
     response.status_code = 201
     return {
