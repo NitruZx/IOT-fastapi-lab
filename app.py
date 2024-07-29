@@ -136,6 +136,58 @@ async def delete_student(student_id: str, response: Response, db: Session = Depe
     return {
         "message" : "Student's ID not found."
     }
+    
+@router_v1.get('/menus')
+async def get_menus(db: Session = Depends(get_db)):
+    return db.query(models.Menu).all()
+
+@router_v1.get('/menus/{menu_id}')
+async def get_menu(menu_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Menu).filter(models.Menu.menu_id == menu_id).first()
+
+@router_v1.post('/menus')
+async def create_menu(menu: dict, response: Response, db: Session = Depends(get_db)):
+    # TODO: Add validation
+    newmenu = models.Menu(menu_name=menu['menu_name'], 
+                          menu_description=menu['menu_description'],
+                          menu_price=menu['menu_price'],
+                          menu_image=menu['menu_image'])
+    db.add(newmenu)
+    db.commit()
+    db.refresh(newmenu)
+    response.status_code = 201
+    return newmenu
+
+@router_v1.patch('/menus/{menu_id}')
+async def update_menu(menu_id: str, menu: dict, response: Response, db: Session = Depends(get_db)):
+    mn = db.query(models.Menu).filter(models.Menu.menu_id == menu_id).first()
+    if (mn is None):
+        response.status_code = 400
+        return {
+            "message" : "Menu's ID not found."
+        }
+    for key in menu:
+        setattr(mn, key, menu[key])
+    db.commit()
+    response.status_code = 201
+    return {
+        "message" : "Menu's info edited successfully"
+    }
+
+@router_v1.delete('/menus/{menu_id}')
+async def delete_menu(menu_id: str, response: Response, db: Session = Depends(get_db)):
+    mn = db.query(models.Menu).filter(models.Menu.menu_id == menu_id).first()
+    if (mn is not None):
+        db.delete(mn)
+        db.commit()
+        response.status_code = 201
+        return {
+            "message" : "delete menu's info successfully"
+        }
+    response.status_code = 400
+    return {
+        "message" : "Menu's ID not found."
+    }
 
 app.include_router(router_v1)
 
