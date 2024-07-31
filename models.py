@@ -3,6 +3,7 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, 
 import enum
 from sqlalchemy import Enum
 from database import Base
+import datetime
 
 class Book(Base):
     __tablename__ = 'books'
@@ -47,3 +48,4 @@ class Order(Base):
     order_tel = Column(String)
     order_item = Column(Text)
     total_price = Column(Float)
+    order_on = Column(DateTime(timezone=True), default=datetime.datetime.now(datetime.UTC))
