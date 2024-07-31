@@ -4,10 +4,12 @@ load_dotenv()
 from fastapi import FastAPI, Depends, Response, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import asc
 
 # Import models
 from database import SessionLocal, engine
 import models
+import json
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -29,8 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# https://fastapi.tiangolo.com/tutorial/sql-databases/#crud-utils
-
 @router_v1.get('/books')
 async def get_books(db: Session = Depends(get_db)):
     return db.query(models.Book).all()
@@ -41,7 +41,6 @@ async def get_book(book_id: int, db: Session = Depends(get_db)):
 
 @router_v1.post('/books')
 async def create_book(book: dict, response: Response, db: Session = Depends(get_db)):
-    # TODO: Add validation
     newbook = models.Book(title=book['title'], 
                           author=book['author'], 
                           year=book['year'], 
@@ -96,7 +95,6 @@ async def get_student(student_id: str, db: Session = Depends(get_db)):
 
 @router_v1.post('/students')
 async def add_student(student: dict, response: Response, db: Session = Depends(get_db)):
-    # TODO: Add validation
     newstu = models.Student(id=student['id'], firstname=student['firstname'], lastname=student['lastname'], dob=student['dob'], sex=student['sex'])
     db.add(newstu)
     db.commit()
@@ -147,7 +145,6 @@ async def get_menu(menu_id: int, db: Session = Depends(get_db)):
 
 @router_v1.post('/menus')
 async def create_menu(menu: dict, response: Response, db: Session = Depends(get_db)):
-    # TODO: Add validation
     newmenu = models.Menu(menu_name=menu['menu_name'], 
                           menu_description=menu['menu_description'],
                           menu_price=menu['menu_price'],
@@ -187,6 +184,41 @@ async def delete_menu(menu_id: str, response: Response, db: Session = Depends(ge
     response.status_code = 400
     return {
         "message" : "Menu's ID not found."
+    }
+
+@router_v1.get('/orders')
+async def get_order(db: Session = Depends(get_db)):
+    return db.query(models.Order).order_by(asc(models.Order.order_id)).all()
+
+@router_v1.get('/orders/{order_id}')
+async def get_order(order_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Order).filter(models.Order.order_id == order_id).first()
+
+@router_v1.post('/orders')
+async def create_order(order: dict, response: Response, db: Session = Depends(get_db)):
+    neworder = models.Order(order_name=order['order_name'], 
+                          order_tel=order['order_tel'],
+                          order_item=order['order_item'],
+                          total_price=order['total_price'])
+    db.add(neworder)
+    db.commit()
+    db.refresh(neworder)
+    response.status_code = 201
+    return neworder
+
+@router_v1.delete('/orders/{order_id}')
+async def delete_order(order_id: str, response: Response, db: Session = Depends(get_db)):
+    od = db.query(models.Order).filter(models.Order.order_id == order_id).first()
+    if (od is not None):
+        db.delete(od)
+        db.commit()
+        response.status_code = 201
+        return {
+            "message" : "Order removed successfully"
+        }
+    response.status_code = 400
+    return {
+        "message" : "Order's ID not found."
     }
 
 app.include_router(router_v1)

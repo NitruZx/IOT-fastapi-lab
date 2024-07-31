@@ -38,3 +38,12 @@ class Menu(Base):
     menu_description = Column(Text)
     menu_price = Column(Float)
     menu_image = Column(Text)
+    
+class Order(Base):
+    __tablename__ = 'orders'
+    
+    order_id = Column(Integer, primary_key=True, index=True)
+    order_name = Column(String)
+    order_tel = Column(String)
+    order_item = Column(Text)
+    total_price = Column(Float)
