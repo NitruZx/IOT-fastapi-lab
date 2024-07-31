@@ -47,7 +47,8 @@ async def create_book(book: dict, response: Response, db: Session = Depends(get_
                           is_published=book['is_published'],
                           description=book['description'],
                           synopsis=book['synopsis'],
-                          image_url=book['image_url'])
+                          image_url=book['image_url'],
+                          category=book['category'])
     db.add(newbook)
     db.commit()
     db.refresh(newbook)
